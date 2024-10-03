@@ -1,2 +1,2 @@
-# RecipieRecomender
-Fullstack implementation of a recipie recomendation application, with frontend, backend and a recomendation engine 
+# RecipeRecomender
+Fullstack implementation of a recipe recomendation application, with frontend, backend and a recomendation engine 
