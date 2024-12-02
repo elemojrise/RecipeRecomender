@@ -1,0 +1,53 @@
+# Ignore the appsettings.Development.json file
+appsettings.Development.json
+
+# Ignore any sensitive or local environment files
+*.local.json
+
+# Ignore build outputs
+bin/
+obj/
+
+# Ignore user-specific files and folders
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Ignore Rider IDE files
+.idea/
+
+# Ignore Visual Studio Code settings
+.vscode/
+
+.vs/
+
+# Ignore package manager directories
+node_modules/
+packages/
+
+# Ignore log files
+*.log
+
+# Ignore temporary files
+*.tmp
+*.temp
+
+# Ignore compiled files
+*.dll
+*.exe
+*.pdb
+
+# Ignore database files
+*.mdf
+*.ldf
+
+# Ignore auto-generated files
+*.generated.cs
+
+# Ignore publish output
+publish/
+
+# Ignore runtime files
+*.lock.json
+*.runtimeconfig.json
