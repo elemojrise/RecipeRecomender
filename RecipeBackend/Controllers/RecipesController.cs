@@ -33,19 +33,18 @@ public class RecipesController(IHttpClientFactory httpClientFactory,
             return NotFound();
         }
 
-        //var response = await _httpClient.GetAsync($"http://localhost:5001/recommendations{recipe}");
-        //if (response.IsSuccessStatusCode)
-        //{
-        //    var jsonString = await response.Content.ReadAsStringAsync();
-        //    var recommendations = JsonSerializer.Deserialize<List<RecipeDto>>(jsonString);
-        //    return Ok(recommendations);
-        //}
-        //else
-        //{
-        //    return StatusCode((int)response.StatusCode, response.Content.ReadAsStringAsync());
-        //}
+        var response = await _httpClient.GetAsync($"http://recommendation-engine:5001/recommendations/{recipe}");
+        if (response.IsSuccessStatusCode)
+        {
+            var jsonstring = await response.Content.ReadAsStringAsync();
+            var recommendations = JsonSerializer.Deserialize<List<RecipeDto>>(jsonstring);
+            return Ok(recommendations);
+        }
+        else
+        {
+            return StatusCode((int)response.StatusCode, await response.Content.ReadAsStringAsync());
+        }
 
-        return Ok(new RecipeDto { Title = recipe });
     }
 
     [HttpPost("add")]

@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  recipe-backend:
+    build:
+      context: ./RecipeBackend  
+      dockerfile: Dockerfile  
+    ports:
+      - "5000:80"  
+    depends_on:
+      - recommendation-engine
+      - db
+    networks:
+      - app-network
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=db;Port=5432;Database=RecipeAppDB;Username=postgres;Password=2040
+
+  recommendation-engine:
+    build:
+      context: ./RecomendationEngine
+      dockerfile: Dockerfile 
+    ports:
+      - "5001:5001"
+    networks:
+      - app-network
+
+  db:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=2040
+      - POSTGRES_DB=RecipeAppDB
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db-data:

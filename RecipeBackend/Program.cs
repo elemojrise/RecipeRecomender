@@ -9,6 +9,10 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
+builder.WebHost.UseUrls("http://0.0.0.0:80");
+builder.Configuration.AddEnvironmentVariables();
+
 builder.Services.AddControllers();
 builder.Services.AddHttpClient();
 
@@ -82,7 +86,6 @@ using (var scope = app.Services.CreateScope())
     context.Database.Migrate();
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

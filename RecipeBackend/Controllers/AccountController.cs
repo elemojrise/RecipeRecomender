@@ -64,7 +64,6 @@ public class AccountController(
                     Person = hubPerson
                 };
 
-                _context.HubPersons.Add(hubPerson);
                 _context.SatPersons.Add(satPerson);
 
                 await _context.SaveChangesAsync();
