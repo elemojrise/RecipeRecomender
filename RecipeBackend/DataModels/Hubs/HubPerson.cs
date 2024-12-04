@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using RecipeBackend.DataModels.Links.LinksPerson;
 using RecipeBackend.DataModels.Satellites;
+using RecipeBackend.Models;
 
 namespace RecipeBackend.DataModels.Hubs;
 
@@ -12,6 +13,7 @@ public class HubPerson
     public DateTime LoadDate { get; set; }
     public string RecordSource { get; set; }
 
+    public ApplicationUser ApplicationUser { get; set; }
 
     [InverseProperty("Person")]
     public ICollection<SatPerson> SatPersons { get; set; }

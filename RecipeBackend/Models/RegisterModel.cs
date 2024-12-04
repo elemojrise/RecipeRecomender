@@ -5,6 +5,9 @@ namespace RecipeBackend.Models;
 public class RegisterModel
 {
     [Required]
+    public string? Name { get; set; }
+
+    [Required]
     [EmailAddress]
     public string? Email { get; set; }
 

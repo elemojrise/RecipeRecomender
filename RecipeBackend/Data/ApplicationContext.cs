@@ -16,7 +16,6 @@ public class ApplicationContext : IdentityDbContext<ApplicationUser>
     {
     }
 
-
     public DbSet<HubPerson> HubPersons { get; set; }
     public DbSet<HubRecipe> HubRecipes { get; set; }
     public DbSet<HubIngredient> HubIngredients { get; set; }

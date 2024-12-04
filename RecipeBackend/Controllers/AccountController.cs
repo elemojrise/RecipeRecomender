@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using RecipeBackend.Data;
+using RecipeBackend.DataModels.Hubs;
+using RecipeBackend.DataModels.Satellites;
 using RecipeBackend.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -12,7 +15,8 @@ namespace RecipeBackend.Controllers;
 [ApiController]
 public class AccountController(
     UserManager<ApplicationUser> _userManager,
-    IConfiguration _configuration) : ControllerBase
+    IConfiguration _configuration,
+    ApplicationContext _context) : ControllerBase
 {
 
     [HttpPost("Register")]
@@ -23,21 +27,61 @@ public class AccountController(
             return BadRequest(ModelState);
         }
 
-        var user = new ApplicationUser
-        {
-            UserName = model.Email,
-            Email = model.Email,
-            DateJoined = DateTime.UtcNow
-        };
-        var result = await _userManager.CreateAsync(user, model.Password);
+        using var transaction = await _context.Database.BeginTransactionAsync();
 
-        if (result.Succeeded)
+        try
         {
-            return Ok();
+            var loadDate = DateTime.UtcNow;
+            var hubPerson = new HubPerson
+            {
+                PersonId = Guid.NewGuid(),
+                LoadDate = loadDate,
+                RecordSource = "Registration"
+            };
+
+
+            var user = new ApplicationUser
+            {
+                UserName = model.Email,
+                Email = model.Email,
+                DateJoined = DateTime.UtcNow,
+                PersonId = hubPerson.PersonId, 
+                Person = hubPerson             
+            };
+
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            if (result.Succeeded)
+            {
+                var satPerson = new SatPerson
+                {
+                    PersonId = hubPerson.PersonId,
+                    LoadDate = loadDate,
+                    Name = model.Name,
+                    Email = model.Email,
+                    EffectiveDate = loadDate,
+                    RecordSource = "Registration",
+                    Person = hubPerson
+                };
+
+                _context.HubPersons.Add(hubPerson);
+                _context.SatPersons.Add(satPerson);
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return Ok();
+            }
+            else
+            {
+                await transaction.RollbackAsync();
+                return BadRequest(result.Errors);
+            }
         }
-        else
+        catch (Exception ex)
         {
-            return BadRequest(result.Errors);
+            await transaction.RollbackAsync();
+            return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while registering the user.");
         }
     }
 
@@ -63,7 +107,6 @@ public class AccountController(
         new Claim(JwtRegisteredClaimNames.Sub, user.Email),
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         new Claim(ClaimTypes.NameIdentifier, user.Id)
-        // Add additional claims if needed
     };
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
